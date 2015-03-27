@@ -46,7 +46,7 @@ describe Api2cart::Daemon::ProxyServer do
           context 'when I 30th request to a random store (31st one in total)' do
             before do
               make_async_request(request_to_random_store)
-              sleep 0.1
+              sleep 0.2
             end
 
             it 'does not let it in' do
@@ -76,7 +76,7 @@ describe Api2cart::Daemon::ProxyServer do
           context 'when I make 25 requests to other stores' do
             let!(:request_threads) do
               25.times.map { make_async_request(request_to_random_store) }
-              sleep 0.1
+              sleep 0.2
             end
 
             it 'lets them all in' do
@@ -98,8 +98,8 @@ describe Api2cart::Daemon::ProxyServer do
       end
     end
 
-    context 'given 5 stores' do
-      let(:store_keys) { %w{first second third fourth fifth} }
+    context 'given 7 stores' do
+      let(:store_keys) { %w{first second third fourth fifth sixths seventh} }
 
       context 'when I make 30 requests per each store' do
         before do
@@ -110,9 +110,9 @@ describe Api2cart::Daemon::ProxyServer do
 
         context 'when each of them acquires quota' do
           before do
-            mock_server.wait_for_number_of_requests(5)
-            5.times { mock_server.respond_to_first }
-            sleep 0.1
+            mock_server.wait_for_number_of_requests(7)
+            7.times { mock_server.respond_to_first }
+            sleep 0.2
           end
 
           it 'allows no more than 30 requests in' do
