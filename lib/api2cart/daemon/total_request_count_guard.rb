@@ -7,7 +7,7 @@ module Api2cart::Daemon
 
     def guard
       response = queued_request_counter.count_request do
-        wait_in_queue! if queued_request_counter.request_count > 30
+        wait_in_queue! if queued_request_counter.request_count > Api2cart::Daemon.total_request_quota
         yield
       end
 

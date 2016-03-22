@@ -9,11 +9,16 @@ require 'api2cart/daemon/anti_throttler'
 require 'api2cart/daemon/proxy_connection_handler'
 require 'api2cart/daemon/proxy_server'
 require 'active_support/core_ext/module/delegation'
+require 'active_support/core_ext/class/attribute_accessors'
 require 'syslog/logger'
 
 module Api2cart
   module Daemon
     LOGGER = Syslog::Logger.new 'api2cart-daemon'
+
+    cattr_reader :total_request_quota do
+      (ENV['API2CART_DAEMON_TOTAL_REQUEST_QUOTA'] || 30).to_i
+    end
 
     def self.run(port)
       ProxyServer.new(port).run
