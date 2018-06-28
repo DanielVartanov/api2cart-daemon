@@ -31,14 +31,31 @@ module Api2cart::Daemon
     end
 
     def send_request_to_remote_server(host, port, request)
+      open_timestamp = Time.now
       remote_server_socket = Celluloid::IO::TCPSocket.new host, port
       remote_server_socket.write request
-      read_http_message(remote_server_socket).message
+      read_timestamp = Time.now
+      message = read_http_message(remote_server_socket).message
+      log_request(request, open_timestamp, read_timestamp)
+      message
     rescue Exception => e
       LOGGER.error "! Problem connecting to server: #{e.inspect}"
       internal_server_error(e)
     ensure
       remote_server_socket.close
+    end
+
+    def log_request(request, open_timestamp, read_timestamp)
+      read_duration = Time.now - read_timestamp
+      open_duration = read_timestamp - open_timestamp
+
+      path = request[/\A\w+\s([^\s]+)\s/, 1]
+
+      uri = URI.parse path
+      api_version, method_name = uri.path.scan(/\A\/(v[^\/]+)\/([\w\.]+)\.json/)[0]
+      store_key = uri.query[/store_key=([^[\&\Z]]+)/,1]
+
+      LOGGER.debug "api=#{api_version} method=#{method_name} store_key=#{store_key} open=#{open_duration} read=#{read_duration}"
     end
 
     def send_response_to_client(client_socket, response)
