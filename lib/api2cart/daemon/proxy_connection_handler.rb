@@ -53,9 +53,19 @@ module Api2cart::Daemon
 
       uri = URI.parse path
       api_version, method_name = uri.path.scan(/\A\/(v[^\/]+)\/([\w\.]+)\.json/)[0]
-      store_key = uri.query[/store_key=([^[\&\Z]]+)/,1]
+      store_key = uri.query[/[\?&]store_key=([^[\&\Z]]+)/,1]
+      count = uri.query[/[\?&]count=([^[\&\Z]]+)/,1]
 
-      LOGGER.debug "api=#{api_version} method=#{method_name} store_key=#{store_key} open=#{open_duration} read=#{read_duration}"
+      message = {
+        'api'       => api_version,
+        'method'    => method_name,
+        'store_key' => store_key,
+        'open'      => open_duration,
+        'read'      => read_duration,
+        'count'     => count
+      }.map {|label,value| [label, value].join('=') unless value.nil? }.compact.join(' ')
+
+      LOGGER.debug message
     end
 
     def send_response_to_client(client_socket, response)
