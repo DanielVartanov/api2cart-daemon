@@ -28,7 +28,7 @@ module Api2cart::Daemon
       begin
         connection_handler.handle_proxy_connection(client_socket)
       rescue Exception => e
-        LOGGER.error "! Exception: #{e.inspect}"
+        LOGGER.error "! Exception: #{e.inspect}\n#{e.backtrace}"
       ensure
         client_socket.close
       end
