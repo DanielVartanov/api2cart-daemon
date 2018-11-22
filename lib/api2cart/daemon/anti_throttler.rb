@@ -6,6 +6,10 @@ module Api2cart::Daemon
     end
 
     def prevent_throttling(http_message)
+      # TODO: Temporary debug message to find out
+      # a problematic requests
+      LOGGER.debug(http_message.inspect) if http_message.request_params.nil?
+
       store_key = http_message.request_params['store_key']
       api_key = http_message.request_params['api_key']
       request_host = http_message.request_host
