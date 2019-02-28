@@ -2,6 +2,9 @@ require 'uri'
 
 module Api2cart::Daemon
   class ProxyConnectionHandler < Struct.new(:anti_throttler)
+
+    ALLOWED_HOSTS = ENV.fetch('ALLOWED_HOSTS', 'api.api2cart.com').split(',')
+
     def handle_proxy_connection(client_socket)
       http_message = read_http_message(client_socket)
       response = compose_response_for(http_message)
@@ -73,7 +76,9 @@ module Api2cart::Daemon
     end
 
     def not_proxy_request?(http_message)
-      URI.parse(http_message.request_url).host.nil?
+      uri = URI.parse(http_message.request_url)
+
+      !(ALLOWED_HOSTS.include?(uri.host) && (uri.query || '').include?('api_key='))
     end
 
     def internal_server_error(exception)
