@@ -1,6 +1,6 @@
 # API2Cart Daemon
 
-TODO: Write a gem description
+**DEPRECATED** Consider using [api2cart-proxy](https://github.com/veeqo/api2cart-proxy) instead
 
 ## Installation
 
